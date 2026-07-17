@@ -1,4 +1,4 @@
-# Duel Kata ⚡
+# Adu Kata ⚡
 
 Adu Cepat Tebak Kata — game tebak kata multiplayer real-time.
 

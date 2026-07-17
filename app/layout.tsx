@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Duel Kata",
+  title: "Adu Kata",
   description: "Adu Cepat Tebak Kata - Game tebak kata multiplayer real-time",
 };
 

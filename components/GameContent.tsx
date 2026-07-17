@@ -311,11 +311,18 @@ export default function GameContent({
               ? "JAWABAN BENAR!"
               : "LAWAN LEBIH CEPAT!"}
         </h2>
-        <p className="text-gray-500 mb-4 md:mb-5 text-sm md:text-lg font-medium">
-          {isTie
-            ? "Tidak ada yang berhasil menebak."
-            : `1 Poin didapatkan oleh <strong class="text-indigo-600 border-b-2 md:border-b-4 border-indigo-200">${winnerName}</strong>`}
-        </p>
+        {isTie ? (
+          <p className="text-gray-500 mb-4 md:mb-5 text-sm md:text-lg font-medium">
+            Tidak ada yang berhasil menebak.
+          </p>
+        ) : (
+          <p className="text-gray-500 mb-4 md:mb-5 text-sm md:text-lg font-medium">
+            1 Poin didapatkan oleh{" "}
+            <strong className="text-indigo-600 border-b-2 md:border-b-4 border-indigo-200">
+              {winnerName}
+            </strong>
+          </p>
+        )}
         {!isTie ? (
           <div className="bg-green-50/90 border-2 md:border-4 border-green-200 rounded-2xl md:rounded-3xl p-4 md:p-5 mb-4 md:mb-5 shadow-lg transform rotate-1">
             <div className="text-[10px] md:text-sm font-bold text-green-700 mb-0.5 md:mb-1 uppercase tracking-widest">

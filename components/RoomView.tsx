@@ -16,6 +16,7 @@ type RoomViewProps = {
   onPlayAgain: () => void;
   checkingWord: boolean;
   error: string;
+  onDismissError: () => void;
   countdownValue: number | null;
 };
 
@@ -32,6 +33,7 @@ export default function RoomView({
   onPlayAgain,
   checkingWord,
   error,
+  onDismissError,
   countdownValue,
 }: RoomViewProps) {
   const target = roomData.targetScore || 10;
@@ -109,8 +111,19 @@ export default function RoomView({
 
         <div className="flex-1 p-3 md:p-6 flex flex-col items-center justify-center relative overflow-hidden w-full bg-white/40">
           {error && (
-            <div className="absolute inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-[2px] bg-white/10 pointer-events-none">
-              <div className="w-full max-w-sm md:max-w-md bg-red-100 border-4 border-red-500 text-red-700 px-5 py-4 md:px-6 md:py-5 rounded-2xl text-sm md:text-lg font-black text-center shadow-[0_0_50px_rgba(220,38,38,0.5)] pop-in pointer-events-auto">
+            <div
+              className="absolute inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-[2px] bg-white/10 pointer-events-auto"
+              onClick={onDismissError}
+            >
+              <div className="w-full max-w-sm md:max-w-md bg-red-100 border-4 border-red-500 text-red-700 px-5 py-4 md:px-6 md:py-5 rounded-2xl text-sm md:text-lg font-black text-center shadow-[0_0_50px_rgba(220,38,38,0.5)] pop-in">
+                <div className="flex justify-end -mt-2 -mr-2 md:-mt-3 md:-mr-3">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDismissError(); }}
+                    className="text-red-400 hover:text-red-600 text-xl leading-none font-bold p-1"
+                  >
+                    ✕
+                  </button>
+                </div>
                 ⚠️ {error}
               </div>
             </div>

@@ -6,10 +6,12 @@ export default function LobbyView({
   onCreateRoom,
   onJoinRoom,
   error,
+  loading,
 }: {
   onCreateRoom: (name: string, targetScore: number) => void;
   onJoinRoom: (name: string, code: string) => void;
   error: string;
+  loading?: boolean;
 }) {
   const [playerName, setPlayerName] = useState("");
   const [joinCode, setJoinCode] = useState("");
@@ -17,13 +19,13 @@ export default function LobbyView({
 
   return (
     <div className="min-h-screen-dynamic flex items-center justify-center p-0 md:p-8">
-      <div className="glass-panel w-full max-w-md md:max-w-4xl rounded-none md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row transition-all duration-500 h-screen-dynamic md:h-auto overflow-y-auto">
+      <div className="glass-panel w-full max-w-md md:max-w-4xl rounded-none md:rounded-3xl shadow-2xl flex flex-col md:flex-row transition-all duration-500 h-screen-dynamic md:h-auto overflow-y-auto">
         <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-6 md:p-10 text-center text-white flex flex-col justify-center items-center md:w-1/2 shrink-0">
           <div className="text-5xl md:text-7xl mb-2 md:mb-4 animate-bounce drop-shadow-lg">
             ⚡
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-1 md:mb-2 tracking-tight">
-            DUEL KATA
+            ADU KATA
           </h1>
           <p className="text-indigo-200 text-sm md:text-base mb-4 md:mb-6 font-medium">
             Adu Cepat Tebak Kata
@@ -114,9 +116,15 @@ export default function LobbyView({
             <button
               id="btn-create-room"
               onClick={() => onCreateRoom(playerName, targetScore)}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 md:py-4 px-6 rounded-xl md:rounded-2xl shadow-[0_6px_0_rgb(67,56,202)] hover:shadow-[0_3px_0_rgb(67,56,202)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 mb-6 md:mb-8 text-base md:text-lg"
+              disabled={loading}
+              className={
+                "w-full font-black py-3 md:py-4 px-6 rounded-xl md:rounded-2xl shadow-[0_6px_0_rgb(67,56,202)] hover:shadow-[0_3px_0_rgb(67,56,202)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 mb-6 md:mb-8 text-base md:text-lg " +
+                (loading
+                  ? "bg-indigo-400 text-indigo-200 cursor-not-allowed shadow-none translate-y-1"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white")
+              }
             >
-              BUAT ROOM BARU
+              {loading ? "MEMPROSES..." : "BUAT ROOM BARU"}
             </button>
 
             <div className="relative flex items-center justify-center mb-4 md:mb-6">
@@ -144,9 +152,15 @@ export default function LobbyView({
               <button
                 id="btn-join-room"
                 onClick={() => onJoinRoom(playerName, joinCode)}
-                className="w-2/5 bg-purple-600 hover:bg-purple-700 text-white font-black py-3 md:py-4 rounded-xl md:rounded-2xl shadow-[0_6px_0_rgb(126,34,206)] hover:shadow-[0_3px_0_rgb(126,34,206)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 text-base md:text-lg"
+                disabled={loading}
+                className={
+                  "w-2/5 font-black py-3 md:py-4 rounded-xl md:rounded-2xl shadow-[0_6px_0_rgb(126,34,206)] hover:shadow-[0_3px_0_rgb(126,34,206)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 text-base md:text-lg " +
+                  (loading
+                    ? "bg-purple-400 text-purple-200 cursor-not-allowed shadow-none translate-y-1"
+                    : "bg-purple-600 hover:bg-purple-700 text-white")
+                }
               >
-                MASUK
+                {loading ? "MEMPROSES..." : "MASUK"}
               </button>
             </div>
           </div>

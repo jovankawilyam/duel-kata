@@ -36,6 +36,7 @@ export default function Home() {
   const [roomData, setRoomData] = useState<RoomData | null>(null);
   const [isCheckingWord, setIsCheckingWord] = useState(false);
   const [lobbyError, setLobbyError] = useState("");
+  const [lobbyLoading, setLobbyLoading] = useState(false);
   const [roomError, setRoomError] = useState("");
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -55,7 +56,13 @@ export default function Home() {
   const loadingStatus = !kbbiReady ? kbbiStatus : authLoading ? "Mengautentikasi..." : kbbiStatus;
 
   useEffect(() => {
-    initFirebase();
+    try {
+      initFirebase();
+    } catch (e) {
+      console.error("Firebase init failed:", e);
+      setAuthLoading(false);
+      return;
+    }
     const unsub = onAuthChange((user) => {
       setCurrentUser(user);
       if (user) {
@@ -100,16 +107,20 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     loadKBBI()
       .then((count) => {
+        if (cancelled) return;
         setKbbiStatus(
           `Siap! ${count.toLocaleString("id-ID")} lema dimuat.`
         );
         setKbbiReady(true);
       })
       .catch((e) => {
+        if (cancelled) return;
         setKbbiStatus(`Gagal memuat kamus: ${e.message}`);
       });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -171,29 +182,37 @@ export default function Home() {
       return;
     }
 
-    const newRoomId = Math.random()
-      .toString(36)
-      .substring(2, 6)
-      .toUpperCase();
-    const roomRef = getRoomRef(newRoomId);
+    setLobbyLoading(true);
+    setLobbyError("");
 
-    await setDoc(roomRef, {
-      roomId: newRoomId,
-      targetScore,
-      status: "waiting",
-      players: {
-        p1: { id: currentUser.uid, name, score: 0 },
-        p2: null,
-      },
-      roles: { depan: null, belakang: null },
-      letters: { depan: "", belakang: "" },
-      winner: null,
-      winningWord: "",
-    });
+    try {
+      const newRoomId = Math.random()
+        .toString(36)
+        .substring(2, 6)
+        .toUpperCase();
+      const roomRef = getRoomRef(newRoomId);
 
-    sessionStorage.setItem("kata_ghost_room", newRoomId);
-    sessionStorage.setItem("kata_ghost_role", "host");
-    joinRoom(newRoomId);
+      await setDoc(roomRef, {
+        roomId: newRoomId,
+        targetScore,
+        status: "waiting",
+        players: {
+          p1: { id: currentUser.uid, name, score: 0 },
+          p2: null,
+        },
+        roles: { depan: null, belakang: null },
+        letters: { depan: "", belakang: "" },
+        winner: null,
+        winningWord: "",
+      });
+
+      sessionStorage.setItem("kata_ghost_room", newRoomId);
+      sessionStorage.setItem("kata_ghost_role", "host");
+      joinRoom(newRoomId);
+    } catch (e) {
+      setLobbyError("Gagal membuat room. Coba lagi.");
+      setLobbyLoading(false);
+    }
   }
 
   async function handleJoinRoom(name: string, code: string) {
@@ -207,33 +226,43 @@ export default function Home() {
     }
     if (!code) return;
 
-    const roomRef = getRoomRef(code);
-    const snapshot = await getDoc(roomRef);
+    setLobbyLoading(true);
+    setLobbyError("");
 
-    if (!snapshot.exists()) {
-      setLobbyError("Kode Room salah / tidak ditemukan!");
-      return;
-    }
+    try {
+      const roomRef = getRoomRef(code);
+      const snapshot = await getDoc(roomRef);
 
-    const data = snapshot.data() as RoomData;
-    if (data.players.p1.id === currentUser.uid) {
-      sessionStorage.setItem("kata_ghost_room", code);
-      sessionStorage.setItem("kata_ghost_role", "host");
-      joinRoom(code);
-    } else if (!data.players.p2) {
-      await updateDoc(roomRef, {
-        "players.p2": { id: currentUser.uid, name, score: 0 },
-        status: "choose_roles",
-      });
-      sessionStorage.setItem("kata_ghost_room", code);
-      sessionStorage.setItem("kata_ghost_role", "guest");
-      joinRoom(code);
-    } else if (data.players.p2?.id === currentUser.uid) {
-      sessionStorage.setItem("kata_ghost_room", code);
-      sessionStorage.setItem("kata_ghost_role", "guest");
-      joinRoom(code);
-    } else {
-      setLobbyError("Room sudah penuh!");
+      if (!snapshot.exists()) {
+        setLobbyError("Kode Room salah / tidak ditemukan!");
+        setLobbyLoading(false);
+        return;
+      }
+
+      const data = snapshot.data() as RoomData;
+      if (data.players.p1.id === currentUser.uid) {
+        sessionStorage.setItem("kata_ghost_room", code);
+        sessionStorage.setItem("kata_ghost_role", "host");
+        joinRoom(code);
+      } else if (!data.players.p2) {
+        await updateDoc(roomRef, {
+          "players.p2": { id: currentUser.uid, name, score: 0 },
+          status: "choose_roles",
+        });
+        sessionStorage.setItem("kata_ghost_room", code);
+        sessionStorage.setItem("kata_ghost_role", "guest");
+        joinRoom(code);
+      } else if (data.players.p2?.id === currentUser.uid) {
+        sessionStorage.setItem("kata_ghost_room", code);
+        sessionStorage.setItem("kata_ghost_role", "guest");
+        joinRoom(code);
+      } else {
+        setLobbyError("Room sudah penuh!");
+        setLobbyLoading(false);
+      }
+    } catch (e) {
+      setLobbyError("Gagal join room. Coba lagi.");
+      setLobbyLoading(false);
     }
   }
 
@@ -664,6 +693,7 @@ export default function Home() {
           onCreateRoom={handleCreateRoom}
           onJoinRoom={handleJoinRoom}
           error={lobbyError}
+          loading={lobbyLoading}
         />
       )}
 
@@ -681,6 +711,7 @@ export default function Home() {
           onPlayAgain={handlePlayAgain}
           checkingWord={isCheckingWord}
           error={roomError}
+          onDismissError={() => setRoomError("")}
           countdownValue={countdownValue}
         />
       )}
