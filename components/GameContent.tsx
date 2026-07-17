@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RoomData } from "@/lib/types";
 
 type GameContentProps = {
@@ -29,6 +29,15 @@ export default function GameContent({
   const [letterInput, setLetterInput] = useState("");
   const [guessInput, setGuessInput] = useState("");
   const status = roomData.status;
+  const prevStatusRef = useRef(status);
+
+  useEffect(() => {
+    if (prevStatusRef.current !== status) {
+      setLetterInput("");
+      setGuessInput("");
+      prevStatusRef.current = status;
+    }
+  }, [status]);
 
   if (status === "waiting") {
     return (
@@ -185,7 +194,7 @@ export default function GameContent({
                     e.target.value.replace(/[^A-Za-z]/g, "").toUpperCase()
                   )
                 }
-                className="w-20 h-20 md:w-32 md:h-32 text-center text-4xl md:text-6xl font-black border-2 md:border-4 border-blue-300 rounded-xl md:rounded-2xl focus:border-blue-600 focus:ring-4 focus:ring-blue-200 outline-none uppercase shadow-inner bg-white"
+                className="w-24 h-24 md:w-36 md:h-36 text-center text-5xl md:text-7xl font-black border-4 md:border-4 border-indigo-400 rounded-2xl md:rounded-2xl focus:border-indigo-600 focus:ring-4 focus:ring-indigo-200 outline-none uppercase bg-indigo-50 text-indigo-900 shadow-lg"
                 autoComplete="off"
                 autoFocus
               />
@@ -269,7 +278,7 @@ export default function GameContent({
                 e.target.value.replace(/[^A-Za-z]/g, "").toUpperCase()
               )
             }
-            className="w-full px-4 py-3 md:px-4 md:py-5 text-center text-lg md:text-3xl font-black tracking-widest border-2 md:border-4 border-indigo-200 rounded-xl md:rounded-2xl focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 outline-none uppercase bg-white shadow-md md:shadow-xl transition-all"
+            className="w-full px-4 py-4 md:px-6 md:py-5 text-center text-xl md:text-3xl font-black tracking-widest border-2 md:border-4 border-indigo-300 rounded-xl md:rounded-2xl focus:border-indigo-600 focus:ring-4 focus:ring-indigo-200 outline-none uppercase bg-indigo-50 text-indigo-900 shadow-md md:shadow-xl transition-all"
             autoComplete="off"
             autoFocus
           />
