@@ -33,7 +33,7 @@ export default function Modal({
           {config.title}
         </h2>
         <p
-          className="text-center text-gray-600 text-sm md:text-base mb-6 font-medium"
+          className="text-center text-gray-700 text-sm md:text-base mb-6 font-medium"
           dangerouslySetInnerHTML={{ __html: config.message }}
         />
         <div className="flex gap-3">

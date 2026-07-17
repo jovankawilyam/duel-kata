@@ -39,12 +39,12 @@ export default function RoomView({
   const target = roomData.targetScore || 10;
 
   return (
-    <div className="min-h-screen-dynamic p-0 md:p-4 lg:p-6 flex items-center justify-center">
-      <div className="glass-panel w-full md:max-w-4xl lg:max-w-5xl h-screen-dynamic md:h-[90vh] rounded-none md:rounded-[2rem] shadow-none md:shadow-2xl overflow-hidden flex flex-col relative">
+    <div className="min-h-screen-dynamic p-1 md:p-4 lg:p-6 flex items-center justify-center">
+      <div className="glass-panel w-full md:max-w-4xl lg:max-w-5xl h-screen-dynamic md:h-[90vh] rounded-xl md:rounded-[2rem] shadow-none md:shadow-2xl overflow-hidden flex flex-col relative">
         <div className="bg-gradient-to-r from-indigo-700 to-purple-800 p-2 md:p-4 text-white flex flex-wrap justify-between items-center shadow-md z-10 shrink-0 gap-1 md:gap-2">
           <div className="flex items-center ml-1 md:ml-0">
             <div className="bg-white/20 px-2 py-1 md:px-3 md:py-2 rounded-lg md:rounded-xl backdrop-blur-md border border-white/30 text-center">
-              <div className="text-[8px] md:text-[10px] text-indigo-100 font-bold uppercase tracking-widest">
+              <div className="text-[10px] md:text-xs text-indigo-200 font-bold uppercase tracking-widest">
                 Kode Room
               </div>
               <div
@@ -57,14 +57,14 @@ export default function RoomView({
           </div>
 
           <div className="flex items-center justify-center flex-1 md:flex-none">
-            <div className="bg-yellow-400 text-yellow-900 px-3 py-1.5 md:py-2 rounded-lg md:rounded-xl font-black shadow-inner border border-yellow-300 text-[10px] md:text-sm animate-pulse">
+            <div className="bg-yellow-400 text-yellow-900 px-3 py-1.5 md:py-2 rounded-lg md:rounded-xl font-black shadow-inner border border-yellow-300 text-xs md:text-sm animate-pulse">
               🎯 TARGET: {target} POIN
             </div>
           </div>
 
           <button
             onClick={onLeaveRoom}
-            className="bg-white/10 hover:bg-red-500 border border-white/20 hover:border-red-400 text-white px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg md:rounded-xl font-bold transition-all text-[10px] md:text-sm mr-1 md:mr-0"
+            className="bg-white/10 hover:bg-red-500 border border-white/20 hover:border-red-400 text-white px-3 md:px-5 py-1.5 md:py-2.5 rounded-lg md:rounded-xl font-bold transition-all text-xs md:text-sm mr-1 md:mr-0"
           >
             Keluar
           </button>
@@ -77,7 +77,7 @@ export default function RoomView({
               (isP1 ? "bg-indigo-50/80 shadow-inner" : "")
             }
           >
-            <div className="text-[9px] md:text-xs text-gray-500 font-black tracking-widest uppercase mb-0.5 md:mb-1">
+            <div className="text-[10px] md:text-sm text-gray-600 font-black tracking-widest uppercase mb-0.5 md:mb-1">
               PEMAIN 1
             </div>
             <div className="font-bold text-sm md:text-lg text-gray-800 truncate mb-1 md:mb-2">
@@ -95,7 +95,7 @@ export default function RoomView({
               (isP2 ? "bg-indigo-50/80 shadow-inner" : "")
             }
           >
-            <div className="text-[9px] md:text-xs text-gray-500 font-black tracking-widest uppercase mb-0.5 md:mb-1">
+            <div className="text-[10px] md:text-sm text-gray-600 font-black tracking-widest uppercase mb-0.5 md:mb-1">
               PEMAIN 2
             </div>
             <div className="font-bold text-sm md:text-lg text-gray-800 truncate mb-1 md:mb-2">
@@ -147,12 +147,12 @@ export default function RoomView({
         </div>
 
         <div className="bg-white/40 backdrop-blur-sm border-t border-gray-200/50 px-3 py-1.5 md:py-2 text-center shrink-0">
-          <span className="text-[9px] md:text-[11px] text-gray-500 font-medium">
+          <span className="text-[10px] md:text-sm text-gray-600 font-medium">
             Created by{" "}
-            <span className="font-bold text-gray-700">
+            <span className="font-bold text-gray-800">
                 Jovanka Wilyam Muzaki
               </span>{" "}
-            <span className="text-gray-300 mx-1">·</span>{" "}
+            <span className="text-gray-400 mx-1">·</span>{" "}
             <a
               href="https://www.instagram.com/jovankawilyamm/"
               target="_blank"

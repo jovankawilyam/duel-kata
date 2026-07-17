@@ -16,7 +16,7 @@ export default function LoadingScreen({
         <h2 className="text-2xl md:text-3xl font-black text-indigo-700 mb-2">
           {isError ? "Gagal Memuat Kamus" : "Memuat Kamus KBBI..."}
         </h2>
-        <p className="text-gray-600 text-sm md:text-base font-medium mb-6">
+        <p className="text-gray-700 text-base md:text-lg font-semibold mb-6">
           {status}
         </p>
         {isError && onRetry && (

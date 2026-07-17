@@ -18,8 +18,8 @@ export default function LobbyView({
   const [targetScore, setTargetScore] = useState(10);
 
   return (
-    <div className="min-h-screen-dynamic flex items-center justify-center p-0 md:p-8">
-      <div className="glass-panel w-full max-w-md md:max-w-4xl rounded-none md:rounded-3xl shadow-2xl flex flex-col md:flex-row transition-all duration-500 h-screen-dynamic md:h-auto overflow-y-auto">
+    <div className="min-h-screen-dynamic flex items-center justify-center p-2 md:p-8">
+      <div className="glass-panel w-full max-w-md md:max-w-4xl rounded-2xl md:rounded-3xl shadow-2xl flex flex-col md:flex-row transition-all duration-500 h-screen-dynamic md:h-auto overflow-y-auto">
         <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-6 md:p-10 text-center text-white flex flex-col justify-center items-center md:w-1/2 shrink-0">
           <div className="text-5xl md:text-7xl mb-2 md:mb-4 animate-bounce drop-shadow-lg">
             ⚡
@@ -27,18 +27,18 @@ export default function LobbyView({
           <h1 className="text-4xl md:text-5xl font-black mb-1 md:mb-2 tracking-tight">
             ADU KATA
           </h1>
-          <p className="text-indigo-200 text-sm md:text-base mb-4 md:mb-6 font-medium">
+          <p className="text-indigo-100 text-sm md:text-base mb-4 md:mb-6 font-medium">
             Adu Cepat Tebak Kata
           </p>
           <div className="bg-white/20 border border-white/30 text-white p-3 md:p-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-bold shadow-inner w-full">
             ⚠️ PERHATIAN: Hanya KATA DASAR KBBI yang diterima!
             <br />
-            <span className="text-indigo-100 font-medium">
+            <span className="text-indigo-100/80 font-medium">
               (Bentuk berimbuhan seperti &quot;berlari&quot;, &quot;makanan&quot; ditolak)
             </span>
           </div>
           <div className="mt-5 md:mt-6 text-center w-full">
-            <div className="text-[10px] md:text-xs text-indigo-200 font-medium tracking-wider uppercase mb-1">
+            <div className="text-xs md:text-sm text-indigo-100/70 font-medium tracking-wider uppercase mb-1">
               Created by
             </div>
             <div className="text-sm md:text-base text-white font-bold">
@@ -97,7 +97,7 @@ export default function LobbyView({
                     <span className="text-xl md:text-2xl font-black text-indigo-700 leading-none">
                       {targetScore}
                     </span>
-                    <span className="text-[10px] md:text-xs font-bold text-gray-500">
+                    <span className="text-xs md:text-sm font-bold text-gray-700">
                       Poin
                     </span>
                   </div>
@@ -128,7 +128,7 @@ export default function LobbyView({
             </button>
 
             <div className="relative flex items-center justify-center mb-4 md:mb-6">
-              <span className="bg-white/80 backdrop-blur-sm px-3 md:px-4 text-xs md:text-sm text-gray-500 font-bold uppercase tracking-widest rounded-full">
+              <span className="bg-white/80 backdrop-blur-sm px-3 md:px-4 text-xs md:text-sm text-gray-700 font-bold uppercase tracking-widest rounded-full">
                 ATAU GABUNG
               </span>
               <div className="absolute w-full border-t-2 border-dashed border-gray-300 -z-10" />

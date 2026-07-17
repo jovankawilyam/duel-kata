@@ -108,7 +108,7 @@ export default function GameContent({
             <br />
             DEPAN
             {roomData.roles.depan && (
-              <div className="mt-2 text-[10px] md:text-sm font-medium bg-black/20 py-1.5 md:py-2 rounded-lg md:rounded-xl mx-4">
+              <div className="mt-2 text-xs md:text-sm font-medium bg-black/20 py-1.5 md:py-2 rounded-lg md:rounded-xl mx-4">
                 Diambil oleh {getName(roomData.roles.depan)}
               </div>
             )}
@@ -127,7 +127,7 @@ export default function GameContent({
             <br />
             BELAKANG
             {roomData.roles.belakang && (
-              <div className="mt-2 text-[10px] md:text-sm font-medium bg-black/20 py-1.5 md:py-2 rounded-lg md:rounded-xl mx-4">
+              <div className="mt-2 text-xs md:text-sm font-medium bg-black/20 py-1.5 md:py-2 rounded-lg md:rounded-xl mx-4">
                 Diambil oleh {getName(roomData.roles.belakang)}
               </div>
             )}
@@ -171,7 +171,7 @@ export default function GameContent({
           </div>
         </div>
         <div className="bg-blue-50/80 backdrop-blur-sm p-4 md:p-8 rounded-3xl md:rounded-[2rem] border-2 md:border-4 border-blue-200 mb-3 md:mb-4 shadow-lg md:shadow-xl w-[90%] md:w-full mx-auto">
-          <div className="mb-4 md:mb-6 text-base md:text-xl font-bold text-blue-800 flex flex-col items-center justify-center gap-1.5 md:gap-2">
+          <div className="mb-4 md:mb-6 text-lg md:text-xl font-bold text-blue-800 flex flex-col items-center justify-center gap-1.5 md:gap-2">
             Tugas Kamu:
             <span className="bg-blue-600 text-white px-4 md:px-5 py-1 md:py-1.5 rounded-lg md:rounded-xl shadow-md uppercase tracking-widest">
               {isDepan ? "Huruf Depan" : "Huruf Belakang"}
@@ -223,7 +223,7 @@ export default function GameContent({
               : "⏳ Menunggu lawan..."}
           </p>
         </div>
-        <div className="text-[10px] md:text-xs text-gray-500 font-medium bg-white/50 inline-block px-3 py-1 md:py-1.5 rounded-lg">
+        <div className="text-xs md:text-sm text-gray-600 font-medium bg-white/50 inline-block px-3 py-1 md:py-1.5 rounded-lg">
           *Waktu habis = huruf acak otomatis
         </div>
       </div>
@@ -243,7 +243,7 @@ export default function GameContent({
         </div>
         <div className="flex justify-center items-center gap-3 md:gap-8 mb-4 md:mb-6 bg-gray-100/80 backdrop-blur-sm p-4 md:p-8 rounded-3xl md:rounded-[2rem] shadow-inner border md:border-2 border-white relative w-[95%] md:w-full mx-auto">
           <div className="flex flex-col items-center">
-            <span className="text-[10px] md:text-sm text-gray-500 font-black mb-1.5 md:mb-2 tracking-widest">
+            <span className="text-xs md:text-sm text-gray-600 font-black mb-1.5 md:mb-2 tracking-widest">
               DEPAN
             </span>
             <div className="w-16 h-16 md:w-24 md:h-24 bg-indigo-900 text-white flex items-center justify-center rounded-xl md:rounded-2xl text-4xl md:text-[60px] font-black shadow-lg md:shadow-xl border-2 md:border-4 border-indigo-500/30">
@@ -254,7 +254,7 @@ export default function GameContent({
             ......
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] md:text-sm text-gray-500 font-black mb-1.5 md:mb-2 tracking-widest">
+            <span className="text-xs md:text-sm text-gray-600 font-black mb-1.5 md:mb-2 tracking-widest">
               BELAKANG
             </span>
             <div className="w-16 h-16 md:w-24 md:h-24 bg-indigo-900 text-white flex items-center justify-center rounded-xl md:rounded-2xl text-4xl md:text-[60px] font-black shadow-lg md:shadow-xl border-2 md:border-4 border-indigo-500/30">
@@ -334,7 +334,7 @@ export default function GameContent({
         )}
         {!isTie ? (
           <div className="bg-green-50/90 border-2 md:border-4 border-green-200 rounded-2xl md:rounded-3xl p-4 md:p-5 mb-4 md:mb-5 shadow-lg transform rotate-1">
-            <div className="text-[10px] md:text-sm font-bold text-green-700 mb-0.5 md:mb-1 uppercase tracking-widest">
+            <div className="text-xs md:text-sm font-bold text-green-700 mb-0.5 md:mb-1 uppercase tracking-widest">
               Kata baku yang ditebak:
             </div>
             <div className="text-2xl md:text-5xl font-black text-green-600 tracking-widest uppercase drop-shadow-sm">
@@ -381,7 +381,7 @@ export default function GameContent({
         </p>
         <div className="flex justify-center gap-4 md:gap-8 mb-6 md:mb-8">
           <div className="bg-indigo-100 rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 text-center border-2 border-indigo-200 min-w-[80px] md:min-w-[120px]">
-            <div className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider truncate max-w-[100px]">
+            <div className="text-xs md:text-sm font-bold text-indigo-700 uppercase tracking-wider truncate max-w-[100px]">
               {roomData.players.p1.name}
             </div>
             <div className="text-xl md:text-3xl font-black text-indigo-900">
@@ -390,7 +390,7 @@ export default function GameContent({
           </div>
           <div className="text-2xl md:text-4xl font-black text-gray-400 flex items-center">:</div>
           <div className="bg-indigo-100 rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 text-center border-2 border-indigo-200 min-w-[80px] md:min-w-[120px]">
-            <div className="text-[10px] md:text-xs font-bold text-indigo-600 uppercase tracking-wider truncate max-w-[100px]">
+            <div className="text-xs md:text-sm font-bold text-indigo-700 uppercase tracking-wider truncate max-w-[100px]">
               {roomData.players.p2?.name ?? "-"}
             </div>
             <div className="text-xl md:text-3xl font-black text-indigo-900">
