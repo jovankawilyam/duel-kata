@@ -58,15 +58,15 @@ export default function Home() {
   useEffect(() => {
     try {
       initFirebase();
-    } catch (e) {
-      console.error("Firebase init failed:", e);
-      setAuthLoading(false);
+    } catch (error) {
+      console.error("Firebase init failed:", error);
+      setTimeout(() => setAuthLoading(false), 0);
       return;
     }
     const unsub = onAuthChange((user) => {
       setCurrentUser(user);
       if (user) {
-        setAuthLoading(false);
+        setTimeout(() => setAuthLoading(false), 0);
         handleGhostRoom();
       }
     });
@@ -127,11 +127,11 @@ export default function Home() {
     if (audioRef.current) {
       if (isMuted) {
         audioRef.current.pause();
-      } else if (roomData?.players.p2) {
+      } else if ((roomData?.players.length ?? 0) > 1) {
         audioRef.current.play().catch(() => {});
       }
     }
-  }, [isMuted, roomData?.players.p2]);
+  }, [isMuted, roomData?.players.length]);
 
   const leaveRoom = useCallback(() => {
     if (intervalRef.current) {
@@ -165,14 +165,14 @@ export default function Home() {
         await deleteDoc(getRoomRef(ghostRoom)).catch(() => {});
       } else {
         await updateDoc(getRoomRef(ghostRoom), {
-          "players.p2": null,
+          players: [],
           status: "waiting",
         }).catch(() => {});
       }
     }
   }
 
-  async function handleCreateRoom(name: string, targetScore: number) {
+  async function handleCreateRoom(name: string, targetScore: number, maxPlayers: number) {
     if (!name) {
       setLobbyError("Masukkan nama Kamu dulu!");
       return;
@@ -196,10 +196,8 @@ export default function Home() {
         roomId: newRoomId,
         targetScore,
         status: "waiting",
-        players: {
-          p1: { id: currentUser.uid, name, score: 0 },
-          p2: null,
-        },
+        maxPlayers,
+        players: [{ id: currentUser.uid, name, score: 0 }],
         roles: { depan: null, belakang: null },
         letters: { depan: "", belakang: "" },
         winner: null,
@@ -209,7 +207,7 @@ export default function Home() {
       sessionStorage.setItem("kata_ghost_room", newRoomId);
       sessionStorage.setItem("kata_ghost_role", "host");
       joinRoom(newRoomId);
-    } catch (e) {
+    } catch {
       setLobbyError("Gagal membuat room. Coba lagi.");
       setLobbyLoading(false);
     }
@@ -240,27 +238,27 @@ export default function Home() {
       }
 
       const data = snapshot.data() as RoomData;
-      if (data.players.p1.id === currentUser.uid) {
-        sessionStorage.setItem("kata_ghost_room", code);
-        sessionStorage.setItem("kata_ghost_role", "host");
-        joinRoom(code);
-      } else if (!data.players.p2) {
-        await updateDoc(roomRef, {
-          "players.p2": { id: currentUser.uid, name, score: 0 },
-          status: "choose_roles",
-        });
+      const players = data.players ?? [];
+      const alreadyJoined = players.some((player) => player.id === currentUser.uid);
+      if (alreadyJoined) {
         sessionStorage.setItem("kata_ghost_room", code);
         sessionStorage.setItem("kata_ghost_role", "guest");
         joinRoom(code);
-      } else if (data.players.p2?.id === currentUser.uid) {
-        sessionStorage.setItem("kata_ghost_room", code);
-        sessionStorage.setItem("kata_ghost_role", "guest");
-        joinRoom(code);
-      } else {
+        return;
+      }
+      if (players.length >= (data.maxPlayers || 2)) {
         setLobbyError("Room sudah penuh!");
         setLobbyLoading(false);
+        return;
       }
-    } catch (e) {
+
+      await updateDoc(roomRef, {
+        players: [...players, { id: currentUser.uid, name, score: 0 }],
+      });
+      sessionStorage.setItem("kata_ghost_room", code);
+      sessionStorage.setItem("kata_ghost_role", "guest");
+      joinRoom(code);
+    } catch {
       setLobbyError("Gagal join room. Coba lagi.");
       setLobbyLoading(false);
     }
@@ -284,12 +282,15 @@ export default function Home() {
           setRoomData({ ...newData });
 
           if (
-            prevData?.players?.p2 &&
-            !newData.players.p2 &&
+            prevData?.players?.length &&
+            newData.players.length < prevData.players.length &&
             currentUserRef.current?.uid &&
-            newData.players.p1.id === currentUserRef.current.uid
+            newData.players.some((player) => player.id === currentUserRef.current?.uid)
           ) {
-            const guestName = prevData.players.p2.name || "Lawan";
+            const removedPlayer = prevData.players.find(
+              (player) => !newData.players.some((nextPlayer) => nextPlayer.id === player.id)
+            );
+            const guestName = removedPlayer?.name || "Lawan";
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
               intervalRef.current = null;
@@ -358,14 +359,11 @@ export default function Home() {
 
   function getName(uid: string | null): string {
     if (!uid || !roomData) return "";
-    if (uid === roomData.players.p1.id) return roomData.players.p1.name;
-    if (roomData.players.p2 && uid === roomData.players.p2.id)
-      return roomData.players.p2.name;
-    return "";
+    const player = roomData.players.find((item) => item.id === uid);
+    return player?.name ?? "";
   }
 
-  const isP1 = currentUser?.uid === roomData?.players.p1.id;
-  const isP2 = currentUser?.uid === roomData?.players.p2?.id;
+  const isHost = roomData?.players[0]?.id === currentUser?.uid;
 
   function startTimer(
     duration: number,
@@ -453,23 +451,20 @@ export default function Home() {
         const data = snap.data() as RoomData;
         if (data.status !== "guessing") return { tooLate: true };
 
-        const isPlayer1 = data.players.p1.id === currentUser.uid;
-        const scorePath = isPlayer1
-          ? "players.p1.score"
-          : "players.p2.score";
-        const currentScore = isPlayer1
-          ? data.players.p1.score
-          : data.players.p2?.score ?? 0;
+        const playerIndex = data.players.findIndex((player) => player.id === currentUser.uid);
+        if (playerIndex === -1) throw new Error("Player tidak ditemukan");
+        const currentScore = data.players[playerIndex].score;
         const newScore = currentScore + 1;
         const reachTarget = newScore >= (data.targetScore || 10);
+        const players = data.players.map((player, index) =>
+          index === playerIndex ? { ...player, score: newScore } : player
+        );
 
         tx.update(roomRef, {
-          status: reachTarget
-            ? "game_over"
-            : "round_end",
+          status: reachTarget ? "game_over" : "round_end",
           winner: currentUser.uid,
           winningWord: word,
-          [scorePath]: newScore,
+          players,
         });
         return { tooLate: false };
       });
@@ -485,36 +480,32 @@ export default function Home() {
   }
 
   async function handlePlayAgain() {
-    if (!roomId) return;
-    if (isP1) {
-      await updateDoc(getRoomRef(roomId), {
-        status: "choose_roles",
-        roles: { depan: null, belakang: null },
-        letters: { depan: "", belakang: "" },
-        winner: null,
-        winningWord: "",
-        "players.p1.score": 0,
-        "players.p2.score": 0,
-      });
-    }
+    if (!roomId || !roomData || !isHost) return;
+    await updateDoc(getRoomRef(roomId), {
+      status: "choose_roles",
+      roles: { depan: null, belakang: null },
+      letters: { depan: "", belakang: "" },
+      winner: null,
+      winningWord: "",
+      players: roomData.players.map((player) => ({ ...player, score: 0 })),
+    });
   }
 
   async function handleLeaveRoom() {
     if (!roomData || !roomId || !currentUser) return;
 
-    const isP1 = roomData.players.p1.id === currentUser.uid;
-    const isP2 = roomData.players.p2?.id === currentUser.uid;
+    const isHostUser = roomData.players[0]?.id === currentUser.uid;
 
     let title: string, message: string, borderColor: string, confirmText: string;
-    if (isP1) {
-      const hasGuest = !!roomData.players.p2;
+    if (isHostUser) {
+      const others = roomData.players.length - 1;
       title = "Tutup Room?";
-      message = hasGuest
-        ? `Kamu adalah <strong class="text-indigo-700">HOST</strong>. Jika kamu keluar, room akan <strong class="text-red-600">DITUTUP</strong> dan <strong class="text-purple-700">${roomData.players.p2?.name}</strong> akan otomatis dikeluarkan juga.<br><br>Yakin ingin keluar?`
-        : `Kamu adalah <strong class="text-indigo-700">HOST</strong>. Room akan ditutup permanen jika kamu keluar.<br><br>Yakin ingin keluar?`;
+      message = others
+        ? `Kamu adalah <strong className="text-indigo-700">HOST</strong>. Jika kamu keluar, room akan <strong className="text-red-600">DITUTUP</strong> dan ${others} pemain lain akan otomatis dikeluarkan juga.<br><br>Yakin ingin keluar?`
+        : `Kamu adalah <strong className="text-indigo-700">HOST</strong>. Room akan ditutup permanen jika kamu keluar.<br><br>Yakin ingin keluar?`;
       borderColor = "border-red-400";
       confirmText = "Ya, Tutup Room";
-    } else if (isP2) {
+    } else if (roomData.players.some((player) => player.id === currentUser.uid)) {
       title = "Keluar dari Room?";
       message = `Kamu akan meninggalkan room ini. Host akan mendapat notifikasi bahwa kamu telah keluar.<br><br>Yakin ingin keluar?`;
       borderColor = "border-yellow-400";
@@ -523,8 +514,9 @@ export default function Home() {
       return;
     }
 
+
     showModalFn({
-      icon: isP1 ? "🚪" : "👋",
+      icon: isHostUser ? "🚪" : "👋",
       title,
       message,
       borderColor,
@@ -542,12 +534,13 @@ export default function Home() {
           onClick: async () => {
             isLeavingRef.current = true;
             try {
-              if (isP1) {
+              if (isHostUser) {
                 await deleteDoc(getRoomRef(roomId));
-              } else if (isP2) {
+              } else {
+                const remainingPlayers = roomData.players.filter((player) => player.id !== currentUser.uid);
                 await updateDoc(getRoomRef(roomId), {
-                  "players.p2": null,
-                  status: "waiting",
+                  players: remainingPlayers,
+                  status: remainingPlayers.length > 1 ? roomData.status : "waiting",
                 });
               }
             } catch (error) {
@@ -565,7 +558,7 @@ export default function Home() {
     if (!roomData || !roomId) return;
     const data = roomData;
     const status = data.status;
-    const isP1 = currentUser?.uid === data.players.p1.id;
+    const isHostUser = data.players[0]?.id === currentUser?.uid;
     const bothLettersDone = data.letters.depan && data.letters.belakang;
 
     const phaseKey = `${status}:${data.roles.depan ?? ""}:${data.roles.belakang ?? ""}:${data.letters.depan}:${data.letters.belakang}`;
@@ -573,7 +566,7 @@ export default function Home() {
     phaseKeyRef.current = phaseKey;
 
     if (status === "choose_roles") {
-      if (isP1 && data.roles.depan && data.roles.belakang) {
+      if (isHostUser && data.roles.depan && data.roles.belakang) {
         updateDoc(getRoomRef(roomId), {
           status: "countdown_letters",
         }).catch(console.error);
@@ -583,7 +576,7 @@ export default function Home() {
 
     if (status === "countdown_letters") {
       startTimer(3, () => {}, () => {
-        if (isP1) {
+        if (isHostUser) {
           updateDoc(getRoomRef(roomId), {
             status: "input_letters",
           }).catch(console.error);
@@ -594,7 +587,7 @@ export default function Home() {
     if (status === "input_letters") {
       if (!bothLettersDone) {
         startTimer(10, () => {}, async () => {
-          if (isP1) {
+          if (isHostUser) {
             const updates: Record<string, unknown> = {};
             if (!data.letters.depan)
               updates["letters.depan"] =
@@ -608,7 +601,7 @@ export default function Home() {
         });
       }
 
-      if (isP1 && bothLettersDone) {
+      if (isHostUser && bothLettersDone) {
         clearTimer();
         updateDoc(getRoomRef(roomId), { status: "guessing" }).catch(
           console.error
@@ -620,7 +613,7 @@ export default function Home() {
       setRoomError("");
       setIsCheckingWord(false);
       startTimer(30, () => {}, async () => {
-        if (isP1) {
+        if (isHostUser) {
           try {
             const db = getDb();
             await runTransaction(db, async (tx) => {
@@ -645,7 +638,7 @@ export default function Home() {
     }
     if (status === "round_end") {
       startTimer(5, () => {}, async () => {
-        if (isP1) {
+        if (isHostUser) {
           await updateDoc(getRoomRef(roomId), {
             status: "input_letters",
             letters: { depan: "", belakang: "" },
@@ -701,8 +694,7 @@ export default function Home() {
         <RoomView
           roomData={roomData}
           currentUserId={currentUser?.uid ?? null}
-          isP1={isP1}
-          isP2={isP2}
+          isHost={isHost}
           getName={getName}
           onLeaveRoom={handleLeaveRoom}
           onRolePick={handleRolePick}

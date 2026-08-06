@@ -6,8 +6,7 @@ import GameContent from "./GameContent";
 type RoomViewProps = {
   roomData: RoomData;
   currentUserId: string | null;
-  isP1: boolean;
-  isP2: boolean;
+  isHost: boolean;
   getName: (uid: string | null) => string;
   onLeaveRoom: () => void;
   onRolePick: (role: "depan" | "belakang") => void;
@@ -23,8 +22,7 @@ type RoomViewProps = {
 export default function RoomView({
   roomData,
   currentUserId,
-  isP1,
-  isP2,
+  isHost,
   getName,
   onLeaveRoom,
   onRolePick,
@@ -72,41 +70,31 @@ export default function RoomView({
 
         <div className="flex bg-white/60 backdrop-blur-sm border-b-2 border-gray-200/50 shrink-0">
           <div
-            className={
-              "flex-1 p-2 md:p-4 text-center border-r-2 border-gray-200/50 transition-colors duration-300 " +
-              (isP1 ? "bg-indigo-50/80 shadow-inner" : "")
-            }
-          >
-            <div className="text-[10px] md:text-sm text-gray-600 font-black tracking-widest uppercase mb-0.5 md:mb-1">
-              PEMAIN 1
+              className={
+                "flex flex-col md:flex-row border-b-2 border-gray-200/50 transition-colors duration-300 " +
+                (isHost ? "bg-indigo-50/80 shadow-inner" : "")
+              }
+            >
+              {roomData.players.map((player, index) => (
+                <div
+                  key={player.id ?? index}
+                  className="flex-1 p-2 md:p-4 text-center border-r-2 last:border-r-0 border-gray-200/50"
+                >
+                  <div className="text-[10px] md:text-sm text-gray-600 font-black tracking-widest uppercase mb-0.5 md:mb-1">
+                    PEMAIN {index + 1}
+                  </div>
+                  <div className="font-bold text-sm md:text-lg text-gray-800 truncate mb-1 md:mb-2">
+                    {player.name}
+                  </div>
+                  <div className="bg-indigo-100 inline-block px-4 md:px-5 py-0.5 md:py-1 rounded-full border border-indigo-200">
+                    <span className="text-lg md:text-3xl font-black text-indigo-700 leading-none">
+                      {player.score}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="font-bold text-sm md:text-lg text-gray-800 truncate mb-1 md:mb-2">
-              {roomData.players.p1.name}
-            </div>
-            <div className="bg-indigo-100 inline-block px-4 md:px-5 py-0.5 md:py-1 rounded-full border border-indigo-200">
-              <span className="text-lg md:text-3xl font-black text-indigo-700 leading-none">
-                {roomData.players.p1.score}
-              </span>
-            </div>
-          </div>
-          <div
-            className={
-              "flex-1 p-2 md:p-4 text-center transition-colors duration-300 " +
-              (isP2 ? "bg-indigo-50/80 shadow-inner" : "")
-            }
-          >
-            <div className="text-[10px] md:text-sm text-gray-600 font-black tracking-widest uppercase mb-0.5 md:mb-1">
-              PEMAIN 2
-            </div>
-            <div className="font-bold text-sm md:text-lg text-gray-800 truncate mb-1 md:mb-2">
-              {roomData.players.p2?.name ?? "..."}
-            </div>
-            <div className="bg-indigo-100 inline-block px-4 md:px-5 py-0.5 md:py-1 rounded-full border border-indigo-200">
-              <span className="text-lg md:text-3xl font-black text-indigo-700 leading-none">
-                {roomData.players.p2?.score ?? "-"}
-              </span>
-            </div>
-          </div>
+
         </div>
 
         <div className="flex-1 p-3 md:p-6 flex flex-col items-center justify-center relative overflow-hidden w-full bg-white/40">

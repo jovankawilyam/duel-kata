@@ -304,9 +304,7 @@ export default function GameContent({
     const iWon = roomData.winner === currentUserId;
     const winnerName = isTie
       ? "-"
-      : roomData.winner === roomData.players.p1.id
-        ? roomData.players.p1.name
-        : roomData.players.p2?.name ?? "-";
+      : roomData.players.find((player) => player.id === roomData.winner)?.name ?? "-";
 
     return (
       <div className="max-w-xl text-center pop-in mx-auto w-[95%]">
@@ -357,11 +355,9 @@ export default function GameContent({
 
   if (status === "game_over") {
     const iWon = roomData.winner === currentUserId;
-    const isP1 = roomData.players.p1.id === currentUserId;
+    const isHost = roomData.players[0]?.id === currentUserId;
     const winnerName =
-      roomData.winner === roomData.players.p1.id
-        ? roomData.players.p1.name
-        : roomData.players.p2?.name ?? "-";
+      roomData.players.find((player) => player.id === roomData.winner)?.name ?? "-";
     const target = roomData.targetScore || 10;
 
     return (
@@ -379,26 +375,19 @@ export default function GameContent({
           mencapai target{" "}
           <strong className="text-yellow-600">{target}</strong> poin!
         </p>
-        <div className="flex justify-center gap-4 md:gap-8 mb-6 md:mb-8">
-          <div className="bg-indigo-100 rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 text-center border-2 border-indigo-200 min-w-[80px] md:min-w-[120px]">
-            <div className="text-xs md:text-sm font-bold text-indigo-700 uppercase tracking-wider truncate max-w-[100px]">
-              {roomData.players.p1.name}
+        <div className="flex justify-center gap-4 md:gap-8 mb-6 md:mb-8 flex-wrap">
+          {roomData.players.map((player, index) => (
+            <div key={player.id ?? index} className="bg-indigo-100 rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 text-center border-2 border-indigo-200 min-w-[80px] md:min-w-[120px]">
+              <div className="text-xs md:text-sm font-bold text-indigo-700 uppercase tracking-wider truncate max-w-[100px]">
+                {player.name}
+              </div>
+              <div className="text-xl md:text-3xl font-black text-indigo-900">
+                {player.score}
+              </div>
             </div>
-            <div className="text-xl md:text-3xl font-black text-indigo-900">
-              {roomData.players.p1.score}
-            </div>
-          </div>
-          <div className="text-2xl md:text-4xl font-black text-gray-400 flex items-center">:</div>
-          <div className="bg-indigo-100 rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 text-center border-2 border-indigo-200 min-w-[80px] md:min-w-[120px]">
-            <div className="text-xs md:text-sm font-bold text-indigo-700 uppercase tracking-wider truncate max-w-[100px]">
-              {roomData.players.p2?.name ?? "-"}
-            </div>
-            <div className="text-xl md:text-3xl font-black text-indigo-900">
-              {roomData.players.p2?.score ?? 0}
-            </div>
-          </div>
+          ))}
         </div>
-        {isP1 ? (
+        {isHost ? (
           <button
             onClick={onPlayAgain}
             className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-black py-3 md:py-5 px-6 rounded-xl md:rounded-2xl shadow-[0_4px_0_rgb(202,138,4)] hover:shadow-[0_2px_0_rgb(202,138,4)] hover:translate-y-1 active:translate-y-1 md:active:translate-y-2 active:shadow-none transition-all text-base md:text-2xl uppercase tracking-widest border-2 border-yellow-500"

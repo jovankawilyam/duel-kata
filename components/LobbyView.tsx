@@ -8,7 +8,7 @@ export default function LobbyView({
   error,
   loading,
 }: {
-  onCreateRoom: (name: string, targetScore: number) => void;
+  onCreateRoom: (name: string, targetScore: number, maxPlayers: number) => void;
   onJoinRoom: (name: string, code: string) => void;
   error: string;
   loading?: boolean;
@@ -16,6 +16,7 @@ export default function LobbyView({
   const [playerName, setPlayerName] = useState("");
   const [joinCode, setJoinCode] = useState("");
   const [targetScore, setTargetScore] = useState(10);
+  const [maxPlayers, setMaxPlayers] = useState(2);
 
   return (
     <div className="min-h-screen-dynamic flex items-center justify-center p-2 md:p-8">
@@ -83,6 +84,33 @@ export default function LobbyView({
           <div>
             <div className="mb-2 md:mb-4">
               <label className="block text-xs font-bold text-gray-500 mb-1 md:mb-2 uppercase tracking-wider">
+                Jumlah Pemain
+              </label>
+              <div className="flex items-center justify-between w-full px-2 py-1.5 md:py-2 border-2 border-gray-200 rounded-xl md:rounded-2xl bg-white/50 shadow-inner mb-3">
+                <button
+                  onClick={() => setMaxPlayers(Math.max(2, maxPlayers - 1))}
+                  className="w-10 h-10 md:w-12 md:h-12 bg-white hover:bg-purple-50 border-2 border-gray-200 text-purple-600 font-black rounded-lg md:rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95 text-lg md:text-xl focus:outline-none focus:border-purple-400"
+                >
+                  -
+                </button>
+                <div className="flex flex-col items-center justify-center select-none pointer-events-none px-2">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl md:text-2xl font-black text-purple-700 leading-none">
+                      {maxPlayers}
+                    </span>
+                    <span className="text-xs md:text-sm font-bold text-gray-700">
+                      Orang
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setMaxPlayers(Math.min(5, maxPlayers + 1))}
+                  className="w-10 h-10 md:w-12 md:h-12 bg-white hover:bg-purple-50 border-2 border-gray-200 text-purple-600 font-black rounded-lg md:rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95 text-lg md:text-xl focus:outline-none focus:border-purple-400"
+                >
+                  +
+                </button>
+              </div>
+              <label className="block text-xs font-bold text-gray-500 mb-1 md:mb-2 uppercase tracking-wider">
                 Target Skor Kemenangan
               </label>
               <div className="flex items-center justify-between w-full px-2 py-1.5 md:py-2 border-2 border-gray-200 rounded-xl md:rounded-2xl bg-white/50 shadow-inner">
@@ -115,7 +143,7 @@ export default function LobbyView({
           <div className="pt-4 md:pt-6 border-t border-gray-200/60">
             <button
               id="btn-create-room"
-              onClick={() => onCreateRoom(playerName, targetScore)}
+              onClick={() => onCreateRoom(playerName, targetScore, maxPlayers)}
               disabled={loading}
               className={
                 "w-full font-black py-3 md:py-4 px-6 rounded-xl md:rounded-2xl shadow-[0_6px_0_rgb(67,56,202)] hover:shadow-[0_3px_0_rgb(67,56,202)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 mb-6 md:mb-8 text-base md:text-lg " +

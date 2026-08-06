@@ -7,11 +7,9 @@ export interface Player {
 export interface RoomData {
   roomId: string;
   targetScore: number;
+  maxPlayers: number;
   status: RoomStatus;
-  players: {
-    p1: Player;
-    p2: Player | null;
-  };
+  players: Player[];
   roles: {
     depan: string | null;
     belakang: string | null;
